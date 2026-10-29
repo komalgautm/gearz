@@ -1,0 +1,1 @@
+[17-Jun-2024 07:39:35 UTC] PHP Fatal error:  Allowed memory size of 536870912 bytes exhausted (tried to allocate 367005696 bytes) in /home2/mobap6fg/public_html/GearzApp/app/Modules/ExternalSystem.php on line 162
