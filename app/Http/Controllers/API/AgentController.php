@@ -168,6 +168,9 @@ class AgentController extends Controller
         }else{
             //about
             $agent = Agent::where('id',$agentID)->where('status',1)->first();
+            if(!$agent){
+                return response()->json(['success'=>'false','message'=>'Agent not found'], 404);
+            }
             $datap['id'] = $agent->id;
             $datap['logo'] = $agent->logo;
             $datap['images'] = $agent->images;
@@ -256,20 +259,20 @@ class AgentController extends Controller
                 $dataBranch['longitude'] = $branchValue->longitude;
                 if($language==2){
                     $dataBranch['name'] = $branchValue->name_ar;
-                    $dataBranch['countryName'] = Country::find($branchValue->country)->name;
-                    $dataBranch['stateName'] = State::find($branchValue->state)->name;
-                    $dataBranch['cityName'] = City::find($branchValue->city)->name;
                 }else{
                     $dataBranch['name'] = $branchValue->name;
-                    $dataBranch['countryName'] = Country::find($branchValue->country)->name;
-                    $dataBranch['stateName'] = State::find($branchValue->state)->name;
-                    $dataBranch['cityName'] = City::find($branchValue->city)->name;
                 }
+                $dataBranch['countryName'] = optional(Country::find($branchValue->country))->name ?? "";
+                $dataBranch['stateName'] = optional(State::find($branchValue->state))->name ?? "";
+                $dataBranch['cityName'] = optional(City::find($branchValue->city))->name ?? "";
                 //brand
                 $branchBrandArray= array();
                 $branchBrand = BranchBrand::where('branchId',$branchValue->id)->get();
                 foreach($branchBrand as $branchval){
                     $databr = Brand::find($branchval->brandId);
+                    if(!$databr){
+                        continue;
+                    }
                     $databranchs['id'] = $databr->id;
                     $databranchs['logo'] = $databr->logo;
                     if($language==2){
@@ -285,6 +288,9 @@ class AgentController extends Controller
                 $servicebranch = ServiceBranch::where('branchId',$branchValue->id)->get();
                 foreach($servicebranch as $servalue){
                     $ser = ServiceType::find($servalue->serviceID);
+                    if(!$ser){
+                        continue;
+                    }
                     $dataservice['serviceid'] = $ser->id;
                     $dataservice['serviceimage'] = $ser->image;
                     if($language==2){
@@ -296,6 +302,7 @@ class AgentController extends Controller
                 }
                 $dataBranch['service'] = $servicebranchArray;
                 //distance
+                $distancebranch = 0;
                 if($lat2!=''){
                     $unit = "K";
                     $distancebranch = $this->getDistance($branchValue->latitude,$branchValue->longitude,$lat2,$lon2,$unit);

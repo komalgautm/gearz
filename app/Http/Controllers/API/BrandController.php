@@ -1117,7 +1117,10 @@ class BrandController extends Controller
     private function getVehicleDataFromCsv($brandID, $year, $brand)
     {
         $csvPath = public_path('brand/excel/' . $brand->excel);
-        if (!File::exists($csvPath)) return [[], []];
+        // excel empty/null => path becomes the excel folder (directory); file() then throws errno=21
+        if (empty($brand->excel) || !is_file($csvPath)) {
+            return [[], []];
+        }
 
         $vehicleArray = [];
         $yearSet = [];
